@@ -1,6 +1,7 @@
 # 🛡️ SOC Terminal Simulator v4.0
+![SOC Terminal](Simulacion-de-ciberataques-1-1200x900.webp)
 
-### [ 🔗 ¡ENTRAR AL SISTEMA AQUÍ! ](https://github.io)
+### [ 🔗 ¡ENTRAR AL SISTEMA AQUÍ! ](https://johnny43-cloud.github.io/soc-terminal-simulator/)
 
 Un simulador interactivo de ciberseguridad de alta fidelidad inspirado en la estética de TRON y los Centros de Operaciones de Seguridad (SOC) empresariales. Desarrollado 100% desde un dispositivo móvil como parte de mi bitácora de ingeniería de software.
 
