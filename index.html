@@ -90,6 +90,30 @@
         let intentosRestantes = 3;
         const claveCorrecta = "2026";
 
+        // Sirena de alarma estilo película (sube y baja de tono)
+        function sonarSirena() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const vol = ctx.createGain();
+                osc.type = "sawtooth";
+                vol.gain.value = 0.25;
+                osc.connect(vol);
+                vol.connect(ctx.destination);
+                osc.start();
+
+                let t = 0;
+                setInterval(() => {
+                    t += 0.03;
+                    // el tono sube y baja entre 500 y 1100 Hz
+                    const frecuencia = 800 + 300 * Math.sin(t * 2.2);
+                    osc.frequency.setValueAtTime(frecuencia, ctx.currentTime);
+                }, 20);
+            } catch (e) {
+                console.log("No se pudo reproducir la sirena", e);
+            }
+        }
+
         function verificarAcceso() {
             let entrada = document.getElementById("token").value.trim();
             let mensajeTxt = document.getElementById("mensaje");
@@ -113,6 +137,7 @@
                         document.body.classList.add("pantalla-roja");
                         contenedor.style.background = "#000";
                         contenedor.style.borderColor = "#fff";
+                        sonarSirena(); // Dispara la sirena
 
                         document.getElementById("token").disabled = true;
                         intentosTxt.innerHTML = "🚨 TERMINAL TOTALMENTE CONGELADA 🚨";
@@ -136,3 +161,4 @@
     </script>
 </body>
 </html>
+
