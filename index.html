@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Terminal v4.0</title>
+    <style>
+        /* Estética TRON / Terminal Corporativa */
+        body {
+            background-color: #050505;
+            color: #00ff66; /* Verde Neón Hacker */
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            transition: background 0.2s;
+        }
+        .pantalla-roja {
+            background-color: #ff0000 !important;
+            color: #ffffff !important;
+            animation: parpadeo 0.4s infinite;
+        }
+        @keyframes parpadeo {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+        .caja-seguridad {
+            background: #111;
+            border: 2px solid #00ff66;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.2);
+            max-width: 450px;
+            width: 100%;
+        }
+        input {
+            background: #000;
+            border: 1px solid #00ff66;
+            color: #00ff66;
+            padding: 12px;
+            font-size: 18px;
+            text-align: center;
+            width: 80%;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        button {
+            background: #00ff66;
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 85%;
+            font-family: inherit;
+        }
+        button:active {
+            background: #00aa44;
+        }
+        .lineas {
+            letter-spacing: -1px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="caja-seguridad" id="contenedor">
+        <h2>🛡️ CENTRO DE SEGURIDAD OPERATIVA (SOC) v4.0 🛡️</h2>
+        <p>ESTADO: MONITOREANDO INTENTOS DE INTRUSIÓN...</p>
+        <p id="intentos" style="color: #ffcc00;">⚠️ SEÑAL ENCRIPTADA | Intentos restantes: 3</p>
+
+        <input type="password" id="token" placeholder="Ingrese token de 4 dígitos" maxlength="4">
+        <button onclick="verificarAcceso()">VERIFICAR CREDENCIALES</button>
+
+        <h4 id="mensaje" style="margin-top: 20px; white-space: pre-line;"></h4>
+    </div>
+
+    <script>
+        let intentosRestantes = 3;
+        const claveCorrecta = "2026";
+
+        function verificarAcceso() {
+            let entrada = document.getElementById("token").value.trim();
+            let mensajeTxt = document.getElementById("mensaje");
+            let intentosTxt = document.getElementById("intentos");
+            let contenedor = document.getElementById("contenedor");
+
+            if (intentosRestantes > 0) {
+                if (entrada === claveCorrecta) {
+                    mensajeTxt.style.color = "#00bcff"; // Azul TRON elegante
+                    mensajeTxt.innerHTML = "<br>🔓 [ACCESO AUTORIZADO] DESENCRIPTACIÓN EXITOSA.<br>Bienvenido, Usuario.";
+                    document.getElementById("token").disabled = true;
+                } else {
+                    intentosRestantes--;
+                    intentosTxt.innerHTML = `⚠️ SEÑAL ENCRIPTADA | Intentos restantes: ${intentosRestantes}`;
+
+                    if (intentosRestantes > 0) {
+                        mensajeTxt.style.color = "#ff3333";
+                        mensajeTxt.innerHTML = "❌ [ERROR DE AUTENTICACIÓN] Token no válido.";
+                    } else {
+                        // ¡LOCKDOWN TOTAL CORPORATIVO!
+                        document.body.classList.add("pantalla-roja");
+                        contenedor.style.background = "#000";
+                        contenedor.style.borderColor = "#fff";
+
+                        document.getElementById("token").disabled = true;
+                        intentosTxt.innerHTML = "🚨 TERMINAL TOTALMENTE CONGELADA 🚨";
+                        intentosTxt.style.color = "#fff";
+
+                        mensajeTxt.style.color = "#fff";
+                        mensajeTxt.innerHTML = `
+                            <span class="lineas">==================================================</span>
+                            🚨 LOCKDOWN ACTIVADO: ¡SISTEMA BLOQUEADO POR SEGURIDAD! 🚨
+                            <span class="lineas">==================================================</span>
+                            DETECCIÓN: Ataque de fuerza bruta o intrusión no autorizada.
+                            ACCIÓN: Se ha enviado un reporte inmediato al Sistema de Seguridad.
+                            CONEXIÓN: Dirección IP guardada en la base de datos local.
+                            ¡Muchos intentos fallidos! Terminal congelada por 15 minutos.
+                            <span class="lineas">==================================================</span>
+                        `;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
