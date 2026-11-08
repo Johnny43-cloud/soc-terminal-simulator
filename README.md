@@ -14,4 +14,4 @@ Un simulador interactivo de ciberseguridad de alta fidelidad inspirado en la est
 * Bucles de control de estado (`while` / bucles lógicos)
 * Operadores lógicos de control (`or` / `and`)
 * Sanitización de cadenas de entrada (`.strip()`)
-* 
+ 
