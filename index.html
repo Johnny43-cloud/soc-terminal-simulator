@@ -31,7 +31,18 @@
             50% { opacity: 0.4; }
             100% { opacity: 1; }
         }
+        #lluvia {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
         .caja-seguridad {
+            position: relative;
+            z-index: 1;
             background: #111;
             border: 2px solid #00ff66;
             padding: 30px;
@@ -75,6 +86,8 @@
 </head>
 <body>
 
+    <canvas id="lluvia"></canvas>
+
     <div class="caja-seguridad" id="contenedor">
         <h2>🛡️ CENTRO DE SEGURIDAD OPERATIVA (SOC) v4.0 🛡️</h2>
         <p>ESTADO: MONITOREANDO INTENTOS DE INTRUSIÓN...</p>
@@ -88,29 +101,81 @@
 
     <script>
         let intentosRestantes = 3;
-        const claveCorrecta = "5084";
+        const claveCorrecta = "2026";
 
-        // Sirena de alarma estilo película (sube y baja de tono)
+        // Lluvia de letras estilo Matrix (fondo)
+        let colorLluvia = "#00ff66";
+        (function iniciarLluvia() {
+            if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+            const canvas = document.getElementById("lluvia");
+            const ctx = canvas.getContext("2d");
+            const letras = "アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789ABCDEF";
+            const tamano = 16;
+            let columnas, gotas;
+
+            function ajustar() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                columnas = Math.floor(canvas.width / tamano);
+                gotas = Array.from({ length: columnas }, () => Math.random() * -50);
+            }
+            ajustar();
+            window.addEventListener("resize", ajustar);
+
+            function dibujar() {
+                // desvanece lo anterior sin tapar el fondo (así deja estela)
+                ctx.globalCompositeOperation = "destination-out";
+                ctx.fillStyle = "rgba(0, 0, 0, 0.12)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.globalCompositeOperation = "source-over";
+
+                ctx.fillStyle = colorLluvia;
+                ctx.font = tamano + "px monospace";
+                for (let i = 0; i < columnas; i++) {
+                    const letra = letras[Math.floor(Math.random() * letras.length)];
+                    ctx.fillText(letra, i * tamano, gotas[i] * tamano);
+                    if (gotas[i] * tamano > canvas.height && Math.random() > 0.975) {
+                        gotas[i] = 0;
+                    }
+                    gotas[i]++;
+                }
+            }
+            setInterval(dibujar, 50);
+        })();
+
+        // Alarma de lockdown tipo bocina de película (grave y fuerte)
         function sonarSirena() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const vol = ctx.createGain();
-                osc.type = "sawtooth";
-                vol.gain.value = 0.25;
-                osc.connect(vol);
-                vol.connect(ctx.destination);
-                osc.start();
+                const volumen = ctx.createGain();
+                volumen.gain.value = 0.3;
+                volumen.connect(ctx.destination);
 
-                let t = 0;
-                setInterval(() => {
-                    t += 0.03;
-                    // el tono sube y baja entre 500 y 1100 Hz
-                    const frecuencia = 800 + 300 * Math.sin(t * 2.2);
-                    osc.frequency.setValueAtTime(frecuencia, ctx.currentTime);
-                }, 20);
+                // Dos ondas juntas para que suene más áspera y real
+                const osc1 = ctx.createOscillator();
+                const osc2 = ctx.createOscillator();
+                osc1.type = "sawtooth";
+                osc2.type = "square";
+                osc2.detune.value = 700; // una quinta arriba
+                osc1.connect(volumen);
+                osc2.connect(volumen);
+                osc1.start();
+                osc2.start();
+
+                // Cada vuelta: el tono sube rápido y baja (WUUUH...)
+                function bocina() {
+                    const t = ctx.currentTime;
+                    [osc1, osc2].forEach(o => {
+                        o.frequency.cancelScheduledValues(t);
+                        o.frequency.setValueAtTime(300, t);
+                        o.frequency.linearRampToValueAtTime(560, t + 0.35);
+                        o.frequency.linearRampToValueAtTime(300, t + 0.9);
+                    });
+                }
+                bocina();
+                setInterval(bocina, 1000); // una bocina por segundo
             } catch (e) {
-                console.log("No se pudo reproducir la sirena", e);
+                console.log("No se pudo reproducir la alarma", e);
             }
         }
 
@@ -135,6 +200,7 @@
                     } else {
                         // ¡LOCKDOWN TOTAL CORPORATIVO!
                         document.body.classList.add("pantalla-roja");
+                        colorLluvia = "#ffffff"; // la lluvia se pone blanca en el lockdown
                         contenedor.style.background = "#000";
                         contenedor.style.borderColor = "#fff";
                         sonarSirena(); // Dispara la sirena
@@ -161,4 +227,3 @@
     </script>
 </body>
 </html>
-
